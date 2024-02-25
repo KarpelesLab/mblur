@@ -38,6 +38,7 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 
 	result := CloneImage(img)
 
+	// apply kernel to image at the appropriate angle
 	rows := img.Bounds().Dy()
 	cols := img.Bounds().Dx()
 	for y := 0; y < rows; y++ {
