@@ -24,13 +24,3 @@ func PerceptibleReciprocal(x float64) float64 {
 func DegreesToRadians(deg float64) float64 {
 	return math.Pi * deg / 180
 }
-
-func ClampToQuantum(quantum float64) float64 {
-	if math.IsNaN(quantum) || quantum <= 0.0 {
-		return 0
-	}
-	if quantum >= QuantumRange {
-		return QuantumRange
-	}
-	return quantum + 0.5
-}
