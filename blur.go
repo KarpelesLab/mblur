@@ -17,6 +17,14 @@ func MotionBlurImage(img image.Image, radius, sigma, angle float64) image.Image 
 	return kernel.Apply(img, angle)
 }
 
+// MotionBlurKernel returns a kernel for a given type of motion blur, and
+// might help make things slightly faster if using the same motion blur
+// radius/sigma on multiple images
+func MotionBlurKernel(radius, sigma float64) Normalized1DKernel {
+	width := GetOptimalKernelWidth1D(radius, sigma)
+	return GetMotionBlurKernel(width, sigma)
+}
+
 func GetMotionBlurKernel(width int, sigma float64) Normalized1DKernel {
 	// #define MagickSigma  (fabs(sigma) < MagickEpsilon ? MagickEpsilon : sigma)
 	if math.Abs(sigma) < MagickEpsilon {
