@@ -2,6 +2,7 @@ package mblur
 
 import (
 	"image"
+	"image/color"
 	"math"
 )
 
@@ -44,25 +45,24 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 	cols := img.Bounds().Dx()
 	for y := 0; y < rows; y++ {
 		for x := 0; x < cols; x++ {
-			var pixel FColor
+			var r, g, b, a float64
 			for j := 0; j < width; j++ {
-				pix := FColorFromColor(img.At(offset[j].X+x, offset[j].Y+y))
-				for i := 0; i < 3; i++ {
-					// multiply each pixel value by their alpha value
-					pixel[i] += kernel[j] * pix[i] * pix[3]
-				}
-				// alpha channel: only multiply by kernel
-				pixel[3] += kernel[j] * pix[3]
+				pr, pg, pb, pa := img.At(offset[j].X+x, offset[j].Y+y).RGBA()
+				r += float64(pr) * kernel[j]
+				g += float64(pg) * kernel[j]
+				b += float64(pb) * kernel[j]
+				a += float64(pa) * kernel[j]
 			}
-			if pixel[3] < 1 {
+			if a < 1 {
 				// we have had some alpha, multiply the various values by gamma
-				gamma := PerceptibleReciprocal(pixel[3])
-				for i := 0; i < 3; i++ {
-					pixel[i] *= gamma
-				}
+				gamma := PerceptibleReciprocal(a)
+				r *= gamma
+				g *= gamma
+				b *= gamma
 			}
 			// this will clamp values
-			result.Set(x, y, pixel)
+			pix := color.RGBA64{R: uint16(r), G: uint16(g), B: uint16(b), A: uint16(a)}
+			result.Set(x, y, pix)
 		}
 	}
 	return result

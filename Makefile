@@ -13,3 +13,6 @@ deps:
 
 test:
 	$(GOROOT)/bin/go test -v -count 1
+
+prof:
+	$(GOROOT)/bin/go test -v -bench=. -test.cpuprofile=cpu.prof
