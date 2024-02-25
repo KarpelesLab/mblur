@@ -17,7 +17,7 @@ func TestBlur(t *testing.T) {
 		return
 	}
 
-	res, _ := mblur.MotionBlurImage(i, 0, 4, 45)
+	res := mblur.MotionBlurImage(i, 0, 4, 45)
 	savePngImage("img/gopher-45.png", res)
 }
 

@@ -10,7 +10,7 @@ import (
 // For reasonable results, radius should be larger than sigma.  Use a
 // radius of 0 and MotionBlurImage() selects a suitable radius for you.
 // Angle gives the angle of the blurring motion.
-func MotionBlurImage(img image.Image, radius, sigma, angle float64) (image.Image, error) {
+func MotionBlurImage(img image.Image, radius, sigma, angle float64) image.Image {
 	width := GetOptimalKernelWidth1D(radius, sigma)
 	kernel := GetMotionBlurKernel(width, sigma)
 
@@ -41,5 +41,5 @@ func MotionBlurImage(img image.Image, radius, sigma, angle float64) (image.Image
 		}
 	}
 
-	return blurImage, nil
+	return blurImage
 }
