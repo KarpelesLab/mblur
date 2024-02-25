@@ -47,11 +47,21 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 			var pixel FColor
 			for j := 0; j < width; j++ {
 				pix := FColorFromColor(img.At(offset[j].X+x, offset[j].Y+y))
-				for i, s := range pix {
-					pixel[i] += kernel[j] * s
+				for i := 0; i < 3; i++ {
+					// multiply each pixel value by their alpha value
+					pixel[i] += kernel[j] * pix[i] * pix[3]
+				}
+				// alpha channel: only multiply by kernel
+				pixel[3] += kernel[j] * pix[3]
+			}
+			if pixel[3] < 1 {
+				// we have had some alpha, multiply the various values by gamma
+				gamma := PerceptibleReciprocal(pixel[3])
+				for i := 0; i < 3; i++ {
+					pixel[i] *= gamma
 				}
 			}
-			// clamp
+			// this will clamp values
 			result.Set(x, y, pixel)
 		}
 	}
