@@ -11,14 +11,14 @@ import (
 
 func TestBlur(t *testing.T) {
 	// test the blur
-	i, err := loadPngImage("gopher.png")
+	i, err := loadPngImage("img/gopher.png")
 	if err != nil {
 		t.Errorf("failed to load img: %s", err)
 		return
 	}
 
 	res, _ := mblur.MotionBlurImage(i, 0, 4, 45)
-	savePngImage("gopher-45.png", res)
+	savePngImage("img/gopher-45.png", res)
 }
 
 func loadPngImage(fn string) (image.Image, error) {
