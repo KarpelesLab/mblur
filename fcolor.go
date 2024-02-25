@@ -38,16 +38,6 @@ func (c FColor) RGBA() (uint32, uint32, uint32, uint32) {
 	return clampAlpha32(c[0], a), clampAlpha32(c[1], a), clampAlpha32(c[2], a), a
 }
 
-func clampFloat(x float64) float64 {
-	if math.IsNaN(x) || x <= 0.0 {
-		return 0
-	}
-	if x > 1 {
-		return 1
-	}
-	return x
-}
-
 // clampAlpha32 returns value of x*a (multiply x by alpha) so that x is adjusted to be in the [0,a] range
 func clampAlpha32(x float64, a uint32) uint32 {
 	if math.IsNaN(x) || x <= 0.0 {
