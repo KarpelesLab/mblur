@@ -4,6 +4,8 @@ import (
 	"image"
 	"image/color"
 	"math"
+	"runtime"
+	"sync"
 )
 
 type Normalized1DKernel []float64
@@ -43,27 +45,39 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 	// apply kernel to image at the appropriate angle
 	rows := img.Bounds().Dy()
 	cols := img.Bounds().Dx()
-	for y := 0; y < rows; y++ {
-		for x := 0; x < cols; x++ {
+	procCnt := runtime.NumCPU() // number of processes to run
+	var wg sync.WaitGroup
+	wg.Add(procCnt)
+	for p := 0; p < procCnt; p++ {
+		go func(p int) {
+			defer wg.Done()
 			var r, g, b, a float64
-			for j := 0; j < width; j++ {
-				pr, pg, pb, pa := img.At(offset[j].X+x, offset[j].Y+y).RGBA()
-				r += float64(pr) * kernel[j]
-				g += float64(pg) * kernel[j]
-				b += float64(pb) * kernel[j]
-				a += float64(pa) * kernel[j]
+			var gamma float64
+
+			for y := p; y < rows; y += procCnt {
+				for x := 0; x < cols; x++ {
+					r, g, b, a = 0, 0, 0, 0
+					for j := 0; j < width; j++ {
+						pr, pg, pb, pa := img.At(offset[j].X+x, offset[j].Y+y).RGBA()
+						r += float64(pr) * kernel[j]
+						g += float64(pg) * kernel[j]
+						b += float64(pb) * kernel[j]
+						a += float64(pa) * kernel[j]
+					}
+					if a < 1 {
+						// we have had some alpha, multiply the various values by gamma
+						gamma = PerceptibleReciprocal(a)
+						r *= gamma
+						g *= gamma
+						b *= gamma
+					}
+					// this will clamp values
+					pix := color.RGBA64{R: uint16(r), G: uint16(g), B: uint16(b), A: uint16(a)}
+					result.Set(x, y, pix)
+				}
 			}
-			if a < 1 {
-				// we have had some alpha, multiply the various values by gamma
-				gamma := PerceptibleReciprocal(a)
-				r *= gamma
-				g *= gamma
-				b *= gamma
-			}
-			// this will clamp values
-			pix := color.RGBA64{R: uint16(r), G: uint16(g), B: uint16(b), A: uint16(a)}
-			result.Set(x, y, pix)
-		}
+		}(p)
 	}
+	wg.Wait()
 	return result
 }
