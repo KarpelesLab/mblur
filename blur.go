@@ -12,7 +12,7 @@ import (
 // Angle gives the angle of the blurring motion.
 func MotionBlurImage(img image.Image, radius, sigma, angle float64) image.Image {
 	width := GetOptimalKernelWidth1D(radius, sigma)
-	kernel := GetMotionBlurKernel(width, sigma)
+	kernel := getMotionBlurKernel(width, sigma)
 
 	return kernel.Apply(img, angle)
 }
@@ -22,10 +22,10 @@ func MotionBlurImage(img image.Image, radius, sigma, angle float64) image.Image 
 // radius/sigma on multiple images
 func MotionBlurKernel(radius, sigma float64) Normalized1DKernel {
 	width := GetOptimalKernelWidth1D(radius, sigma)
-	return GetMotionBlurKernel(width, sigma)
+	return getMotionBlurKernel(width, sigma)
 }
 
-func GetMotionBlurKernel(width int, sigma float64) Normalized1DKernel {
+func getMotionBlurKernel(width int, sigma float64) Normalized1DKernel {
 	// #define MagickSigma  (fabs(sigma) < MagickEpsilon ? MagickEpsilon : sigma)
 	if math.Abs(sigma) < MagickEpsilon {
 		sigma = MagickEpsilon
