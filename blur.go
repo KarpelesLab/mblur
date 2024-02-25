@@ -2,7 +2,6 @@ package mblur
 
 import (
 	"image"
-	"log"
 	"math"
 )
 
@@ -15,12 +14,7 @@ func MotionBlurImage(img image.Image, radius, sigma, angle float64) (image.Image
 	width := GetOptimalKernelWidth1D(radius, sigma)
 	kernel := GetMotionBlurKernel(width, sigma)
 
-	log.Printf("width = %d, kernel = %+v", width, kernel)
-	var sum float64
-	for _, x := range kernel {
-		sum += x
-	}
-
+	// compute directional offset table
 	point := PointInfo{float64(width) * math.Sin(DegreesToRadians(angle)), float64(width) * math.Cos(DegreesToRadians(angle))}
 	offset := make([]image.Point, width)
 	for w := 0; w < width; w += 1 {
@@ -36,13 +30,10 @@ func MotionBlurImage(img image.Image, radius, sigma, angle float64) (image.Image
 	for y := 0; y < rows; y++ {
 		for x := 0; x < cols; x++ {
 			var pixel FColor
-			pixel[3] = 1 // opaque
-			var rgba [3]uint32
 			for j := 0; j < width; j++ {
-				pix := img.At(offset[j].X+x, offset[j].Y+y)
-				rgba[0], rgba[1], rgba[2], _ = pix.RGBA()
-				for i := 0; i < 3; i++ {
-					pixel[i] += kernel[j] * float64(rgba[i]) / float64(0xffff)
+				pix := FColorFromColor(img.At(offset[j].X+x, offset[j].Y+y))
+				for i := 0; i < 4; i++ {
+					pixel[i] += kernel[j] * pix[i]
 				}
 			}
 			// clamp
