@@ -2,7 +2,7 @@
 
 # mblur
 
-Motion blur adapted from ImageMagick, but without any kind of performance optimization.
+Multi-threaded motion blur adapted from ImageMagick.
 
 ```
 %  MotionBlurImage() simulates motion blur.  We convolve the image with a
