@@ -1,3 +1,5 @@
+[![GoDoc](https://godoc.org/github.com/KarpelesLab/mblur?status.svg)](https://godoc.org/github.com/KarpelesLab/mblur)
+
 # mblur
 
 Motion blur adapted from ImageMagick, but without any kind of performance optimization.
