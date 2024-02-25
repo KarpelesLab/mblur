@@ -46,8 +46,8 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 			var pixel FColor
 			for j := 0; j < width; j++ {
 				pix := FColorFromColor(img.At(offset[j].X+x, offset[j].Y+y))
-				for i := 0; i < 4; i++ {
-					pixel[i] += kernel[j] * pix[i]
+				for i, s := range pix {
+					pixel[i] += kernel[j] * s
 				}
 			}
 			// clamp
