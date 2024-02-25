@@ -53,6 +53,7 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 			defer wg.Done()
 			var r, g, b, a float64
 			var gamma float64
+			var pix color.RGBA64
 
 			for y := p; y < rows; y += procCnt {
 				for x := 0; x < cols; x++ {
@@ -72,7 +73,7 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 						b *= gamma
 					}
 					// this will clamp values
-					pix := color.RGBA64{R: uint16(r), G: uint16(g), B: uint16(b), A: uint16(a)}
+					pix.R, pix.G, pix.B, pix.A = clamp16(r), clamp16(g), clamp16(b), clamp16(a)
 					result.Set(x, y, pix)
 				}
 			}
@@ -80,4 +81,14 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 	}
 	wg.Wait()
 	return result
+}
+
+func clamp16(v float64) uint16 {
+	if math.IsNaN(v) || v <= 0 {
+		return 0
+	}
+	if v >= 0xffff {
+		return 0xffff
+	}
+	return uint16(v)
 }
