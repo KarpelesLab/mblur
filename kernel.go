@@ -31,9 +31,10 @@ func (kernel Normalized1DKernel) Apply(img image.Image, angle float64) image.Ima
 	// compute directional offset table
 	point := PointInfo{float64(width) * math.Sin(DegreesToRadians(angle)), float64(width) * math.Cos(DegreesToRadians(angle))}
 	offset := make([]image.Point, width)
+	hypotXY := math.Hypot(point.X, point.Y)
 	for w := 0; w < width; w += 1 {
-		offset[w].X = int(math.Ceil(float64(w)*point.Y/math.Hypot(point.X, point.Y) - 0.5))
-		offset[w].Y = int(math.Ceil(float64(w)*point.X/math.Hypot(point.X, point.Y) - 0.5))
+		offset[w].X = int(math.Ceil(float64(w)*point.Y/hypotXY - 0.5))
+		offset[w].Y = int(math.Ceil(float64(w)*point.X/hypotXY - 0.5))
 	}
 
 	result := CloneImage(img)
